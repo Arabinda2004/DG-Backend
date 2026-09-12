@@ -32,8 +32,9 @@ const createPost = async (req, res) => {
 
 const getAllPosts = async (req, res) => {
     try {
-        const { search } = req.query
-        console.log(search);
+        const { search, author, page = 1, limit = 10 } = req.query
+        const pageNumber = Number(page);
+        const limitNumber = Number(limit);
         let query = {}
         if (search) {
             query = {
@@ -53,7 +54,18 @@ const getAllPosts = async (req, res) => {
                 ]
             }
         }
-        const posts = await postModel.find(query).populate("author", "name email")
+        if (author) {
+            query.author = author
+        }
+
+        const skip = (pageNumber - 1) * limitNumber;
+
+        const posts = await postModel
+        .find(query)
+        .populate("author", "name email")
+        .skip(skip)
+        .limit(limitNumber)
+
         res.status(200).json({
             success: true,
             message: "Successfully fetched all the posts",
@@ -63,7 +75,8 @@ const getAllPosts = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             success: false,
-            message: "Internal server error!"
+            message: "Internal server error!",
+            error: error.message
         })
     }
 }
