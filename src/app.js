@@ -1,9 +1,22 @@
-const express = require('express')
+const express = require("express");
 const cookieParser = require("cookie-parser");
 
+const authRoutes = require("./routes/auth.routes");
+const postRoutes = require("./routes/post.routes");
 
-const app = express()
-app.use(express.json())
+const app = express();
+
+app.use(express.json());
 app.use(cookieParser());
 
-module.exports = app
+app.get("/health", (req, res) => {
+    res.status(200).json({
+        success: true,
+        health: "OK",
+    });
+});
+
+app.use("/api/auth", authRoutes);
+app.use("/api/post", postRoutes);
+
+module.exports = app;

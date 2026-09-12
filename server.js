@@ -1,21 +1,21 @@
-const app = require('./src/app')
-const connectDB = require('./src/config/db')
-const authRoutes = require('./src/routes/auth.routes')
-const postRoutes = require('./src/routes/post.routes')
 require("dotenv").config();
 
-connectDB()
+const app = require("./src/app");
+const connectDB = require("./src/config/db");
 
-app.get('/health', (req, res) => {
-    res.status(200).json({
-        success: true,
-        health: "OK"
-    })
-})
+const PORT = process.env.PORT || 3000;
 
-app.use('/api/auth', authRoutes)
-app.use('/api/post', postRoutes)
+const startServer = async () => {
+    try {
+        await connectDB();
 
-app.listen(process.env.PORT || 3000, () => {
-    console.log("Server listening on http://localhost:3000");
-})
+        app.listen(PORT, () => {
+            console.log(`Server listening on http://localhost:${PORT}`);
+        });
+    } catch (error) {
+        console.error("Failed to start server:", error.message);
+        process.exit(1);
+    }
+};
+
+startServer();
